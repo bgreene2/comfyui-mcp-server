@@ -20,7 +20,7 @@ This repository contains an MCP (Model Context Protocol) server for generating i
 
 1. Clone this repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/bgreene2/comfyui-mcp-server.git
    cd comfyui-mcp-server
    ```
 
