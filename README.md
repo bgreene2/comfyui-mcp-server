@@ -87,7 +87,7 @@ If you need to specify a custom working directory (where workflow files are loca
 Then run the server:
 
 ```bash
-fastmcp run /path/to/server.py
+python /path/to/server.py
 ```
 
 #### Environment Variables:
