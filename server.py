@@ -92,6 +92,7 @@ noise_seed_key = 'noise_seed'
 width_key = 'width'
 height_key = 'height'
 text_key = 'text'
+filename_prefix_key = 'filename_prefix'
 
 # Load the workflow and config files
 workflow_json_path = os.path.join(working_dir, "workflows", f"{comfyui_workflow_name}.json")
@@ -130,6 +131,11 @@ def comfyui_generate_image(prompt: str, title: str, aspect_ratio: str) -> tuple:
 
     width, height = comfyui_workflow[config_key][aspect_ratios_key][aspect_ratio]
 
+    # Construct image filename
+    image_title = re.sub(special_char_pattern, '-', title)
+    formatted_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    image_filename_no_ext = f"{formatted_datetime}_{image_title}_{comfyui_workflow_name}"
+
     # Build the ComfyUI workflow payload
     prompt_structure = comfyui_workflow[workflow_key]
 
@@ -147,6 +153,8 @@ def comfyui_generate_image(prompt: str, title: str, aspect_ratio: str) -> tuple:
 
     for prompt_node in comfyui_workflow[config_key][prompt_nodes_key]:
         prompt_structure[prompt_node][inputs_key][text_key] = prompt
+
+    prompt_structure[comfyui_workflow[config_key][save_image_node_key]][inputs_key][filename_prefix_key] = image_filename_no_ext
 
     # Define functions to interact with ComfyUI API
     def queue_prompt(prompt):
@@ -200,9 +208,7 @@ def comfyui_generate_image(prompt: str, title: str, aspect_ratio: str) -> tuple:
         # Save the image to a temporary file
         image_data = images[0]
         image = Image.open(io.BytesIO(image_data))
-        image_title = re.sub(special_char_pattern, '-', title)
-        formatted_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-        image_filename = f"{formatted_datetime}_{image_title}_{comfyui_workflow_name}.png"
+        image_filename = f"{image_filename_no_ext}.png"
         image_path = os.path.join(output_dir, image_filename)
         os.makedirs(os.path.dirname(image_path), exist_ok=True)
         image.save(image_path)
